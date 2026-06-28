@@ -3,7 +3,7 @@ NEVID-UFJF 2026
 ## 1. Manifesto de Auditoria
 O CRI não é um instrumento de acompanhamento; é uma ferramenta de auditoria forense aplicada à falência do Estado. O projeto visa mapear, via Ciência de Dados, o hiato temporal e substantivo entre a notificação da violência de gênero e o desfecho letal. A premissa central é que a letalidade não é um evento aleatório, mas um subproduto mensurável da omissão institucional e da seletividade penal.
 
-## 2. Metodologia: O Núcleo do CRI
+## 2. Metodologia: O Núcleo do CRIF
 O sistema opera através de quatro eixos de análise (Ratio Analytics):
 - **Ingestão Ontológica:** Extração e estruturação de dados judiciais brutos (acórdãos e sentenças) em matrizes de covariáveis de risco.
 - **Análise de Sobrevivência (Regressão de Cox):** Mensuração do tempo até a falência do sistema de proteção (o $T_0$ marcado pelo primeiro acionamento do Estado e o evento de censura à direita definido pelo óbito ou pela persistência da vida).
@@ -28,4 +28,4 @@ O sistema opera através de quatro eixos de análise (Ratio Analytics):
 3. A estrutura do diretório (`data/`, `scripts/`, `docs/`) deve ser mantida com rigor absoluto para evitar a contaminação do pipeline.
 
 ---
-*CRI - Calculadora de Risco Institucional | NEVIDH - UFJF*
+*OBSERVATÓRIO DO FEMINICÍDIO | NEVIDH - UFJF*
