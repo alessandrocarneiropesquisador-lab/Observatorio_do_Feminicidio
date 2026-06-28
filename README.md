@@ -1,4 +1,4 @@
-# Observatório do Feminicídio: Calculadora de Risco Institucional (CRI)
+# Observatório do Feminicídio: Calculadora de Risco Institucional do Feminicídio (CRIF)
 NEVID-UFJF 2026
 ## 1. Manifesto de Auditoria
 O CRI não é um instrumento de acompanhamento; é uma ferramenta de auditoria forense aplicada à falência do Estado. O projeto visa mapear, via Ciência de Dados, o hiato temporal e substantivo entre a notificação da violência de gênero e o desfecho letal. A premissa central é que a letalidade não é um evento aleatório, mas um subproduto mensurável da omissão institucional e da seletividade penal.
