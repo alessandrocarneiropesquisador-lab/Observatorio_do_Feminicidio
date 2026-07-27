@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A rotina e a morte — Painel Interativo CRIF</title>
+<style>
+  html,body{margin:0;padding:0;background:#f2f1ec;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
+  .crif-banner{background:#1A237E;color:#fff;padding:16px 24px;display:flex;align-items:center;gap:16px;}
+  .crif-banner img{height:48px;width:auto;flex-shrink:0;background:#fff;border-radius:6px;padding:4px;}
+  .crif-banner-text{display:flex;flex-direction:column;gap:2px;}
+  .crif-banner-title{font-size:18px;font-weight:600;line-height:1.3;}
+  .crif-banner-sub{font-size:12px;color:#c5cae9;}
+  @media (max-width:520px){
+    .crif-banner{padding:12px 14px;gap:10px;}
+    .crif-banner-title{font-size:14px;}
+    .crif-banner img{height:36px;}
+  }
+  .crif-outer{max-width:900px;margin:24px auto;padding:0 16px;}
+  .crif-wrap{background:#fff;border:1px solid #ccc;border-radius:12px;padding:18px 20px;position:relative;box-sizing:border-box;}
+  .crif-title{font-size:17px;font-weight:500;color:#1A237E;border-bottom:2px solid #1A237E;padding-bottom:8px;margin-bottom:12px;line-height:1.4;}
+  .crif-hint{font-size:11px;color:#888;margin-bottom:8px;}
+  .tip{position:fixed;background:#1e2030;color:#f0f0f0;border-radius:8px;padding:10px 14px;font-size:12px;line-height:1.6;max-width:300px;pointer-events:none;z-index:9999;display:none;border:1px solid #444;}
+  .tip strong{color:#ffd54f;display:block;margin-bottom:4px;font-size:13px;}
+  .tip a{color:#80cbc4;text-decoration:underline;pointer-events:auto;}
+  svg{width:100%;height:auto;display:block;}
+  svg [data-tip]{cursor:pointer;}
+  svg [data-link]{cursor:pointer;}
+  .km-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+  .km-chips span{font-size:11px;border:1px solid #ccc;border-radius:20px;padding:3px 11px;cursor:pointer;color:#444;}
+  .km-chips span:hover{background:#e8eaf6;border-color:#1A237E;color:#1A237E;}
+  .km-data-btn{font-size:12px;border:1px solid #1A237E;border-radius:20px;padding:5px 14px;cursor:pointer;color:#1A237E;background:#fff;margin-top:10px;}
+  .km-data-btn:hover{background:#1A237E;color:#fff;}
+  .km-data-panel{display:none;margin-top:10px;border:1px solid #d8d6cf;border-radius:8px;padding:12px 14px;background:#fafaf7;}
+  .km-data-panel table{width:100%;border-collapse:collapse;font-size:12px;}
+  .km-data-panel th,.km-data-panel td{padding:5px 8px;text-align:center;border-bottom:1px solid #e2e0d8;}
+  .km-data-panel th{color:#1A237E;font-weight:600;}
+  .km-data-panel .lbl{text-align:left;color:#444;}
+  .km-data-panel caption{font-size:11px;color:#8a7a5a;text-align:left;margin-bottom:6px;caption-side:top;}
+  .legend{display:flex;gap:18px;margin-top:10px;flex-wrap:wrap;}
+  .leg{display:flex;align-items:center;gap:6px;font-size:11px;color:#444;}
+  .leg-line{width:28px;height:3px;}
+  .credits{display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-top:10px;padding-top:6px;border-top:1px solid #f0f0f0;}
+  .credits-logo{display:flex;flex-direction:column;align-items:center;gap:1px;flex-shrink:0;}
+  .credits-logo img{height:16px;width:16px;object-fit:contain;opacity:0.85;}
+  .credits-logo span{font-size:6px;color:#bbb;}
+  .credits-text{font-size:7px;color:#aaa;line-height:1.4;text-align:left;}
+  .credits-text b{color:#999;font-weight:600;}
+  @media (max-width:520px){
+    .crif-title{font-size:15px;}
+    .crif-wrap{padding:14px 12px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- BANNER DE TOPO -->
+<div class="crif-banner">
+
+  <img src="data:image/png;base64,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" alt="Logo NEVIDH" style="height:52px;width:52px;object-fit:contain;">
+  <div class="crif-banner-text">
+    <div class="crif-banner-title">Análise de Sobrevivência: Feminicídio, Violência Doméstica e Risco Institucional de Omissão</div>
+    <div class="crif-banner-sub">CRIF · NEVIDH-UFJF · Observatório do Feminicídio · Minas Gerais, 2016–2023</div>
+  </div>
+</div>
+
+<div class="crif-outer">
+<div class="crif-wrap">
+<div class="crif-title">A rotina e a morte: resposta institucional e risco de feminicídio em Minas Gerais (2016–2023)</div>
+
+<svg id="svg" viewBox="0 0 720 440" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+
+<!-- DESFECHOS PUNITIVOS -->
+<g data-tip="cond">
+<rect x="200" y="20" width="136" height="44" rx="7" fill="#FDECEA" stroke="#C62828" stroke-width="1.8"/>
+<text x="268" y="39" text-anchor="middle" font-size="13" font-weight="500" fill="#7F1D1D">Condenação</text>
+<text x="268" y="56" text-anchor="middle" font-size="11" fill="#A03A2E">j = 1</text>
+</g>
+<g data-tip="presc">
+<rect x="352" y="20" width="136" height="44" rx="7" fill="#FDECEA" stroke="#C62828" stroke-width="1.8"/>
+<text x="420" y="39" text-anchor="middle" font-size="13" font-weight="500" fill="#7F1D1D">Prescrição</text>
+<text x="420" y="56" text-anchor="middle" font-size="11" fill="#A03A2E">j = 2</text>
+</g>
+<g data-tip="arq">
+<rect x="504" y="20" width="148" height="44" rx="7" fill="#FDECEA" stroke="#C62828" stroke-width="1.8"/>
+<text x="578" y="39" text-anchor="middle" font-size="13" font-weight="500" fill="#7F1D1D">Arquivamento</text>
+<text x="578" y="56" text-anchor="middle" font-size="11" fill="#A03A2E">j = 3</text>
+</g>
+
+<!-- TRONCO PUNITIVO -->
+<line x1="420" y1="102" x2="420" y2="86" stroke="#C62828" stroke-width="5"/>
+<line x1="268" y1="86" x2="578" y2="86" stroke="#C62828" stroke-width="5"/>
+<line x1="268" y1="64" x2="268" y2="86" stroke="#C62828" stroke-width="5" marker-end="url(#ah)"/>
+<line x1="420" y1="64" x2="420" y2="86" stroke="#C62828" stroke-width="5" marker-end="url(#ah)"/>
+<line x1="578" y1="64" x2="578" y2="86" stroke="#C62828" stroke-width="5" marker-end="url(#ah)"/>
+
+<!-- CAIXA PUNIÇÃO -->
+<g data-tip="pun">
+<rect x="368" y="102" width="104" height="34" rx="7" fill="#C62828" stroke="#7F1D1D" stroke-width="2"/>
+<text x="420" y="124" text-anchor="middle" font-size="14" font-weight="500" fill="#fff">Punição</text>
+</g>
+<text x="487" y="124" font-size="10" fill="#a03a2e">S(t) cai rápido</text>
+
+<!-- SETA GROSSA PUNIÇÃO -->
+<line x1="420" y1="164" x2="420" y2="150" stroke="#C62828" stroke-width="11"/>
+<polygon points="420,136 409,155 431,155" fill="#C62828"/>
+
+<!-- TJMG / WEBER -->
+<g id="tjmgNode" data-tip="tjmg">
+<ellipse cx="420" cy="218" rx="96" ry="54" fill="#E8EAF6" stroke="#1A237E" stroke-width="3.5"/>
+<text x="420" y="205" text-anchor="middle" font-size="18" font-weight="500" fill="#1A237E">TJMG</text>
+<text x="420" y="225" text-anchor="middle" font-size="14" font-weight="500" fill="#283593">Weber</text>
+<text x="420" y="243" text-anchor="middle" font-size="10" fill="#3949AB">máquina tecnicamente racional</text>
+</g>
+
+<!-- SETA PONTILHADA PROTEÇÃO -->
+<line x1="420" y1="272" x2="420" y2="296" stroke="#1E9E4A" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ah)"/>
+
+<!-- CAIXA PROTEÇÃO -->
+<g data-tip="prot">
+<rect x="368" y="300" width="104" height="34" rx="7" fill="#E8F7EC" stroke="#1E9E4A" stroke-width="2"/>
+<text x="420" y="322" text-anchor="middle" font-size="14" font-weight="500" fill="#14602F">Proteção</text>
+</g>
+<text x="487" y="322" font-size="10" fill="#2f7a4a">S(t) cai devagar</text>
+
+<!-- TRONCO PROTETIVO -->
+<line x1="420" y1="334" x2="420" y2="352" stroke="#1E9E4A" stroke-width="2" stroke-dasharray="6 4"/>
+<line x1="268" y1="352" x2="578" y2="352" stroke="#1E9E4A" stroke-width="2" stroke-dasharray="6 4"/>
+<line x1="268" y1="352" x2="268" y2="370" stroke="#1E9E4A" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ah)"/>
+<line x1="420" y1="352" x2="420" y2="370" stroke="#1E9E4A" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ah)"/>
+<line x1="578" y1="352" x2="578" y2="370" stroke="#1E9E4A" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ah)"/>
+
+<!-- DESFECHOS PROTETIVOS -->
+<g data-tip="mp1">
+<rect x="200" y="374" width="136" height="44" rx="7" fill="#E8F7EC" stroke="#1E9E4A" stroke-width="1.8"/>
+<text x="268" y="393" text-anchor="middle" font-size="13" font-weight="500" fill="#14602F">Medida deferida</text>
+<text x="268" y="409" text-anchor="middle" font-size="11" fill="#2f7a4a">j = 1</text>
+</g>
+<g data-tip="mp2">
+<rect x="352" y="374" width="136" height="44" rx="7" fill="#E8F7EC" stroke="#1E9E4A" stroke-width="1.8"/>
+<text x="420" y="393" text-anchor="middle" font-size="13" font-weight="500" fill="#14602F">Descumprimento</text>
+<text x="420" y="409" text-anchor="middle" font-size="11" fill="#2f7a4a">j = 2</text>
+</g>
+<g data-tip="mp3">
+<rect x="504" y="374" width="148" height="44" rx="7" fill="#E8F7EC" stroke="#1E9E4A" stroke-width="1.8"/>
+<text x="578" y="393" text-anchor="middle" font-size="13" font-weight="500" fill="#14602F">Prescrição da MPU</text>
+<text x="578" y="409" text-anchor="middle" font-size="11" fill="#2f7a4a">j = 3</text>
+</g>
+
+<!-- FEMINICÍDIO - clicável -->
+<g data-tip="fem" data-link="https://www.tjmg.jus.br/portal-tjmg/noticias/homem-que-matou-a-ex-na-frente-da-filha-de-5-anos-vai-a-juri-popular.htm">
+<rect x="10" y="72" width="152" height="36" rx="7" fill="#fff" stroke="#C62828" stroke-width="2.2"/>
+<text x="86" y="88" text-anchor="middle" font-size="12" font-weight="500" fill="#7F1D1D">Feminicídio</text>
+<text x="86" y="101" text-anchor="middle" font-size="9" fill="#C62828">🔗 clique p/ notícia</text>
+</g>
+<path d="M162 95 Q260 130 364 175" fill="none" stroke="#C62828" stroke-width="1.8" marker-end="url(#ah)"/>
+
+<!-- VIOLÊNCIA DOMÉSTICA - clicável -->
+<g data-tip="vd" data-link="https://www.tjmg.jus.br/portal-tjmg/transparencia/tj-em-numeros/">
+<rect x="8" y="330" width="158" height="46" rx="7" fill="#fff" stroke="#1E9E4A" stroke-width="2.2"/>
+<text x="87" y="346" text-anchor="middle" font-size="12" font-weight="500" fill="#14602F">Violência</text>
+<text x="87" y="360" text-anchor="middle" font-size="12" font-weight="500" fill="#14602F">doméstica</text>
+<text x="87" y="372" text-anchor="middle" font-size="9" fill="#1E9E4A">🔗 clique p/ dados</text>
+</g>
+<path d="M166 349 Q262 320 364 262" fill="none" stroke="#1E9E4A" stroke-width="1.8" marker-end="url(#ah)"/>
+
+<!-- CURVAS KM -->
+<g id="kmBox">
+<rect x="8" y="118" width="164" height="200" rx="8" fill="#fff" stroke="#1A237E" stroke-width="1.4"/>
+<text x="90" y="137" text-anchor="middle" font-size="12" font-weight="600" fill="#1A237E">Curva KM real — sondagem</text>
+<line x1="34" y1="155" x2="34" y2="260" stroke="#444" stroke-width="1"/>
+<line x1="34" y1="260" x2="160" y2="260" stroke="#444" stroke-width="1"/>
+<text x="30" y="159" text-anchor="end" font-size="9" fill="#555">1</text>
+<text x="30" y="263" text-anchor="end" font-size="9" fill="#555">0</text>
+<text x="18" y="151" font-size="10" fill="#444">S(t)</text>
+<text x="97" y="275" text-anchor="middle" font-size="10" fill="#444">t (dias, até 900)</text>
+<clipPath id="kmClip"><rect x="34" y="155" width="126" height="105"/></clipPath>
+<g clip-path="url(#kmClip)">
+<polygon points="34.0,155.0 34.1,155.3 34.8,155.9 35.2,156.8 35.3,158.8 35.4,159.9 36.0,162.4 36.1,163.7 37.9,165.0 38.3,166.3 38.6,167.7 39.6,169.1 39.8,170.5 40.2,172.0 40.6,176.5 41.1,178.0 44.2,179.5 45.5,181.1 45.8,184.3 48.2,187.5 48.4,189.2 48.7,190.8 51.2,192.5 52.4,195.9 56.4,199.3 56.8,201.0 62.3,204.6 64.0,206.3 66.0,208.1 69.5,211.8 71.0,213.6 72.8,215.5 76.3,217.4 90.9,219.3 97.2,221.2 100.3,225.1 102.7,225.1 112.9,225.1 115.3,227.3 116.5,229.6 117.1,231.9 121.2,234.3 127.2,234.3 127.7,239.7 127.7,256.5 127.2,253.2 121.2,253.2 117.1,251.7 116.5,250.2 115.3,248.5 112.9,246.9 102.7,246.9 100.3,246.9 97.2,244.1 90.9,242.6 76.3,241.2 72.8,239.7 71.0,238.2 69.5,236.7 66.0,233.6 64.0,232.0 62.3,230.4 56.8,227.2 56.4,225.6 52.4,222.3 51.2,218.9 48.7,217.2 48.4,215.5 48.2,213.7 45.8,210.2 45.5,206.6 44.2,204.8 41.1,203.0 40.6,201.2 40.2,195.5 39.8,193.6 39.6,191.6 38.6,189.7 38.3,187.7 37.9,185.7 36.1,183.6 36.0,181.6 35.4,177.3 35.3,175.1 35.2,170.7 34.8,168.5 34.1,167.0 34.0,155.0" fill="#C62828" opacity="0.12"/>
+<polygon points="34.0,155.0 34.1,155.1 34.5,155.1 34.7,155.5 34.8,156.4 35.3,158.1 35.8,159.3 36.4,160.0 36.5,160.6 36.6,161.3 37.3,161.3 37.4,162.0 38.3,162.7 38.5,163.4 38.7,164.1 39.5,164.9 39.9,167.1 40.3,167.9 40.4,168.6 40.8,169.4 41.9,170.9 42.3,171.7 43.8,171.7 44.1,172.5 45.1,173.3 47.0,174.1 47.8,174.1 48.6,174.9 49.7,175.8 50.5,177.4 52.7,178.3 55.0,179.1 58.4,179.9 60.2,180.8 61.4,181.6 61.7,182.5 62.2,183.4 65.2,184.2 65.3,185.1 65.5,185.9 66.0,186.8 66.5,187.7 68.0,188.6 72.4,189.4 73.1,189.4 74.3,190.3 77.4,191.2 83.3,192.1 83.4,193.0 84.6,193.9 88.5,195.8 91.3,196.7 103.2,197.6 115.6,198.5 118.4,199.4 130.1,201.3 130.1,220.5 118.4,218.7 115.6,217.8 103.2,216.8 91.3,215.9 88.5,215.0 84.6,213.1 83.4,212.2 83.3,211.2 77.4,210.3 74.3,209.3 73.1,208.4 72.4,208.4 68.0,207.4 66.5,206.5 66.0,205.5 65.5,204.6 65.3,203.6 65.2,202.7 62.2,201.7 61.7,200.7 61.4,199.8 60.2,198.8 58.4,197.8 55.0,196.8 52.7,195.8 50.5,194.9 49.7,192.9 48.6,191.9 47.8,190.9 47.0,190.9 45.1,189.9 44.1,188.9 43.8,187.9 42.3,187.9 41.9,186.9 40.8,184.9 40.4,183.8 40.3,182.8 39.9,181.8 39.5,178.7 38.7,177.6 38.5,176.6 38.3,175.5 37.4,174.4 37.3,173.4 36.6,173.4 36.5,172.3 36.4,171.2 35.8,170.1 35.3,167.8 34.8,164.4 34.7,162.0 34.5,161.2 34.1,161.2 34.0,155.0" fill="#1E9E4A" opacity="0.14"/>
+</g>
+<path d="M34.0 155.0 L34.1 155.0 L34.1 156.8 L34.8 156.8 L34.8 158.6 L35.2 158.6 L35.2 160.3 L35.3 160.3 L35.3 163.9 L35.4 163.9 L35.4 165.7 L36.0 165.7 L36.0 169.2 L36.1 169.2 L36.1 171.0 L37.9 171.0 L37.9 172.8 L38.3 172.8 L38.3 174.6 L38.6 174.6 L38.6 176.4 L39.6 176.4 L39.6 178.1 L39.8 178.1 L39.8 179.9 L40.2 179.9 L40.2 181.7 L40.6 181.7 L40.6 187.0 L41.1 187.0 L41.1 188.8 L44.2 188.8 L44.2 190.6 L45.5 190.6 L45.5 192.4 L45.8 192.4 L45.8 195.9 L48.2 195.9 L48.2 199.5 L48.4 199.5 L48.4 201.3 L48.7 201.3 L48.7 203.0 L51.2 203.0 L51.2 204.8 L52.4 204.8 L52.4 208.4 L56.4 208.4 L56.4 212.0 L56.8 212.0 L56.8 213.7 L62.3 213.7 L62.3 217.3 L64.0 217.3 L64.0 219.1 L66.0 219.1 L66.0 220.8 L69.5 220.8 L69.5 224.4 L71.0 224.4 L71.0 226.2 L72.8 226.2 L72.8 228.0 L76.3 228.0 L76.3 229.7 L90.9 229.7 L90.9 231.5 L97.2 231.5 L97.2 233.3 L100.3 233.3 L100.3 236.9 L102.7 236.9 L112.9 236.9 L115.3 236.9 L115.3 239.0 L116.5 239.0 L116.5 241.1 L117.1 241.1 L117.1 243.2 L121.2 243.2 L121.2 245.3 L127.2 245.3 L127.7 245.3 L127.7 250.2 L152 250.2" fill="none" stroke="#C62828" stroke-width="2.6"/>
+<path d="M34.0 155.0 L34.1 155.0 L34.1 155.9 L34.5 155.9 L34.5 155.9 L34.7 155.9 L34.7 156.8 L34.8 156.8 L34.8 158.6 L35.3 158.6 L35.3 161.3 L35.8 161.3 L35.8 163.1 L36.4 163.1 L36.4 164.0 L36.5 164.0 L36.5 165.0 L36.6 165.0 L36.6 165.9 L37.3 165.9 L37.4 165.9 L37.4 166.8 L38.3 166.8 L38.3 167.7 L38.5 167.7 L38.5 168.6 L38.7 168.6 L38.7 169.5 L39.5 169.5 L39.5 170.4 L39.9 170.4 L39.9 173.2 L40.3 173.2 L40.3 174.1 L40.4 174.1 L40.4 175.0 L40.8 175.0 L40.8 175.9 L41.9 175.9 L41.9 177.7 L42.3 177.7 L42.3 178.7 L43.8 178.7 L44.1 178.7 L44.1 179.6 L45.1 179.6 L45.1 180.5 L47.0 180.5 L47.0 181.4 L47.8 181.4 L48.6 181.4 L48.6 182.4 L49.7 182.4 L49.7 183.3 L50.5 183.3 L50.5 185.2 L52.7 185.2 L52.7 186.1 L55.0 186.1 L55.0 187.0 L58.4 187.0 L58.4 188.0 L60.2 188.0 L60.2 188.9 L61.4 188.9 L61.4 189.8 L61.7 189.8 L61.7 190.8 L62.2 190.8 L62.2 191.7 L65.2 191.7 L65.2 192.7 L65.3 192.7 L65.3 193.6 L65.5 193.6 L65.5 194.5 L66.0 194.5 L66.0 195.5 L66.5 195.5 L66.5 196.4 L68.0 196.4 L68.0 197.3 L72.4 197.3 L73.1 197.3 L73.1 198.3 L74.3 198.3 L74.3 199.2 L77.4 199.2 L77.4 200.2 L83.3 200.2 L83.3 201.1 L83.4 201.1 L83.4 202.1 L84.6 202.1 L84.6 203.0 L88.5 203.0 L88.5 204.9 L91.3 204.9 L91.3 205.9 L103.2 205.9 L103.2 206.8 L115.6 206.8 L115.6 207.8 L118.4 207.8 L118.4 208.7 L130.1 208.7 L152 210.6" fill="none" stroke="#1E9E4A" stroke-width="2.6" stroke-dasharray="6 3"/>
+<text x="90" y="287" text-anchor="middle" font-size="9" fill="#8a7a5a">sondagem · G1 · não probabilística</text>
+<line x1="20" y1="300" x2="36" y2="300" stroke="#C62828" stroke-width="3"/>
+<text x="40" y="303" font-size="9" fill="#C62828">Punição, n=60</text>
+<line x1="20" y1="309" x2="36" y2="309" stroke="#1E9E4A" stroke-width="3" stroke-dasharray="4 3"/>
+<text x="40" y="312" font-size="9" fill="#1E9E4A">Proteção, n=124</text>
+
+<!-- camada interativa: segue o mouse e mostra valor real -->
+<line id="kmGuide" x1="34" y1="155" x2="34" y2="260" stroke="#666" stroke-width="1" stroke-dasharray="2 2" visibility="hidden"/>
+<circle id="kmDotPun" r="3.6" fill="#C62828" stroke="#fff" stroke-width="1" visibility="hidden"/>
+<circle id="kmDotProt" r="3.6" fill="#1E9E4A" stroke="#fff" stroke-width="1" visibility="hidden"/>
+<rect id="kmHoverArea" x="34" y="155" width="126" height="105" fill="transparent" style="cursor:crosshair"/>
+</g>
+</svg>
+
+<div class="km-data-panel" id="kmDataPanel">
+  <table>
+    <caption>Sondagem exploratória, primeira instância (G1), TJMG — não probabilística</caption>
+    <thead>
+      <tr><th class="lbl">Marco</th><th>Punição (n=60)</th><th>Proteção (n=124)</th></tr>
+    </thead>
+    <tbody id="kmDataBody"></tbody>
+  </table>
+</div>
+
+<div class="km-chips">
+<span data-tip="cox">Cox (1972)</span>
+<span data-tip="fg">Fine e Gray (1999)</span>
+<span data-tip="km">🕐 Kaplan-Meier</span>
+<span data-tip="j">Índice j</span>
+</div>
+
+<div class="legend">
+<div class="leg"><div class="leg-line" style="background:#C62828"></div>Via punitiva — cadência rápida</div>
+<div class="leg"><div class="leg-line" style="background:#1E9E4A;border-top:2px dashed #1E9E4A;height:0"></div>Via protetiva — cadência lenta</div>
+</div>
+
+<div class="credits">
+  <div class="credits-logo">
+    <img src="data:image/png;base64,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" alt="NEVIDH">
+    <span>2026</span>
+  </div>
+  <div class="credits-text">
+    <b>Coordenação:</b> Prof. Dr. Paulo Fraga<br>
+    <b>Dados:</b> Me. Alessandro Carneiro<br>
+    <b>Desenvolvimento:</b> Me. Alessandro Carneiro
+  </div>
+</div>
+</div>
+</div>
+
+<div class="tip" id="tip"></div>
+
+<script>
+var tips={
+tjmg:{t:"TJMG — Weber",b:"O aparato judicial é a máquina tecnicamente racional de Weber (2004): cada peça cumpre corretamente a regra que lhe compete. A vara que declina da competência observa a regra; a audiência redesignada preserva o contraditório. Cada ato isolado é correto. Somados no tempo, compõem a trajetória que o sistema se propôs a evitar. Nenhum agente decide a morte; ela emerge do funcionamento normal do aparelho."},
+pun:{t:"Via punitiva",b:"Caminho que conduz à responsabilização do agressor. A hipótese central é que o aparelho é mais célere aqui do que na via protetiva. Na curva de sobrevivência S(t), isso aparece como queda mais íngreme: os processos alcançam desfecho mais cedo."},
+prot:{t:"Via protetiva",b:"Caminho que conduz à proteção da vítima ainda viva. A face da omissão é invisível porque não produz ato algum — sua marca é a ausência de movimento onde havia dever de movimentar-se. A curva S(t) cai mais suavemente: os processos demoram mais, ou não chegam a desfecho dentro da janela de observação."},
+fem:{t:"Feminicídio — clique para acessar",b:'TPU 12091. MG concentra o maior volume absoluto entre as UFs levantadas pelo FBSP (2026): 414 casos no triênio 2021-2023, com 16,7% das vítimas sob medida protetiva vigente no momento da morte. <a href="https://www.tjmg.jus.br/portal-tjmg/noticias/homem-que-matou-a-ex-na-frente-da-filha-de-5-anos-vai-a-juri-popular.htm" target="_blank">Caso real: pronúncia por feminicídio com medida protetiva descumprida — TJMG, Comarca de BH, 25/06/2026</a>.'},
+vd:{t:"Violência doméstica — clique para dados",b:'TPU 10948 e 10949. Fonte primária: DataJud/CNJ, validada pela série do REDS/Polícia Civil de MG (2018-2023). Achado da sondagem: o campo de identificação da beneficiária de medida protetiva é preenchido em apenas 0,03% dos processos — a mulher existe como parte processual, mas não é inscrita como sujeito de proteção. <a href="https://www.tjmg.jus.br/portal-tjmg/transparencia/tj-em-numeros/" target="_blank">Acesse: TJ em Números — TJMG</a>.'},
+cond:{t:"Condenação — j = 1",b:"Sentença ou acórdão com resultado condenatório. É o desfecho que o sistema exibe como prova de que funcionou. Efeito perverso: a condenação obtida depois da morte torna a omissão anterior desmentível."},
+presc:{t:"Prescrição — j = 2",b:"Extinção da punibilidade pelo decurso do prazo (art. 107, IV c/c art. 109 do CP). Não é falha; é regra válida. É a tradução processual do 'deixar morrer' foucaultiano: o tempo administrativo, e não decisão substantiva alguma, determina o desfecho."},
+arq:{t:"Arquivamento — j = 3",b:"Encerramento sem julgamento de mérito. Compõe, com a prescrição, o que esta pesquisa trata como desfecho omissivo na análise ecológica por comarca."},
+mp1:{t:"Medida deferida — j = 1",b:"Concessão da medida protetiva de urgência. Atenção ao confundimento por indicação: mulheres que obtêm medida deferida podem ser justamente aquelas percebidas em maior risco pelo próprio sistema. Nenhuma estimativa autoriza inferência causal direta."},
+mp2:{t:"Descumprimento — j = 2",b:"Medida concedida e não fiscalizada. É o ponto exato em que o dever de agir existe — juridicamente exigível pela Lei 11.340/2006 — e ainda assim a resposta não se materializa."},
+mp3:{t:"Prescrição da MPU — j = 3",b:"A medida perde eficácia pelo decurso do tempo sem que decisão alguma tenha sido tomada. Omissão em sua forma mais pura: não há ato a questionar, há apenas ausência de movimento registrada em data certa."},
+km:{t:"Kaplan-Meier — S(t), curva real",b:"S(t) é a probabilidade de o processo ainda não ter atingido desfecho até o tempo t. Curva calculada de verdade a partir da sondagem exploratória do DataJud, primeira instância (G1), depois de corrigir três bugs de dado: formato misto de data, e dois valores sentinela de sistema legado (1900-01-01 e 2400-01-01 como marcadores de ausência). Resultado: via punitiva, n=60, mediana de 140 dias até desfecho. Via protetiva, n=124, mediana de 622 dias. A punição resolve cerca de 4 vezes mais rápido nesta amostra. Não é resultado da tese — é sondagem pequena, não probabilística — mas é o primeiro número real do projeto, não mais estimativa."},
+cox:{t:"Cox (1972) — modelo base",b:"λ(t|Z) = λ₀(t) · exp(βᵀZ). λ(t|Z): risco instantâneo dado Z; λ₀(t): risco de base variando só com o tempo; β: coeficientes que medem o efeito de cada covariável; Z: covariáveis do processo (especialização do juízo, audiência, redistribuição). Ao interpretar uma covariável, as demais ficam fixadas na referência. Suposição de proporcionalidade verificada pelo teste de Schoenfeld (1982)."},
+fg:{t:"Fine e Gray (1999) — riscos competitivos",b:"λⱼ(t|Z) = λ₀ⱼ(t) · exp(βⱼᵀZ). Variação do Cox onde o índice j identifica cada tipo de desfecho separadamente. Cox trata os demais eventos como censura, inflando artificialmente o risco do evento principal. Aqui, condenação, prescrição e arquivamento disputam o mesmo processo: se um ocorre, os outros saem definitivamente do risco. Cada j tem seu próprio risco de base λ₀ⱼ e seus próprios coeficientes βⱼ."},
+j:{t:"O índice j",b:"j identifica qual desfecho está sendo modelado. Via punitiva: j=1 condenação, j=2 prescrição, j=3 arquivamento. Via protetiva: j=1 medida deferida, j=2 descumprimento, j=3 prescrição da MPU. Sem j não há riscos competitivos — ele é o que permite estimar cada desfecho levando em conta que os demais competem pelo mesmo processo."}
+};
+
+var tip=document.getElementById('tip');
+
+// ----- Dados reais da curva de Kaplan-Meier (sondagem, G1) -----
+var kmDados = {"punicao": {"tempo": [0.0, 1.0, 6.0, 9.0, 10.0, 11.0, 15.0, 16.0, 30.0, 33.0, 35.0, 43.0, 44.0, 47.0, 50.0, 54.0, 78.0, 88.0, 90.0, 108.0, 110.0, 112.0, 131.0, 140.0, 171.0, 174.0, 216.0, 229.0, 244.0, 271.0, 282.0, 296.0, 323.0, 434.0, 482.0, 506.0, 524.0, 602.0, 620.0, 629.0, 634.0, 665.0, 711.0, 715.0, 1216.0, 1288.0, 2002.0, 7145.0], "sobrevivencia": [1.0, 0.9831, 0.9661, 0.9492, 0.9153, 0.8983, 0.8644, 0.8475, 0.8305, 0.8136, 0.7966, 0.7797, 0.7627, 0.7458, 0.6949, 0.678, 0.661, 0.6441, 0.6102, 0.5763, 0.5593, 0.5424, 0.5254, 0.4915, 0.4576, 0.4407, 0.4068, 0.3898, 0.3729, 0.339, 0.322, 0.3051, 0.2881, 0.2712, 0.2542, 0.2203, 0.2203, 0.2203, 0.2003, 0.1803, 0.1602, 0.1402, 0.1402, 0.0935, 0.0935, 0.0623, 0.0623, 0.0], "ic_inferior": [1.0, 0.8857, 0.8712, 0.8506, 0.8083, 0.7876, 0.7471, 0.7274, 0.7079, 0.6887, 0.6697, 0.651, 0.6325, 0.6142, 0.5604, 0.5428, 0.5254, 0.5081, 0.474, 0.4405, 0.424, 0.4076, 0.3914, 0.3593, 0.3278, 0.3123, 0.2817, 0.2666, 0.2517, 0.2223, 0.2078, 0.1936, 0.1795, 0.1656, 0.1519, 0.1252, 0.1252, 0.1252, 0.1091, 0.0936, 0.0787, 0.0644, 0.0644, 0.0329, 0.0329, 0.0143, 0.0143, 0.0], "ic_superior": [1.0, 0.9976, 0.9914, 0.9833, 0.9638, 0.953, 0.9298, 0.9175, 0.905, 0.8921, 0.879, 0.8656, 0.852, 0.8382, 0.7955, 0.781, 0.7663, 0.7514, 0.7211, 0.6903, 0.6747, 0.659, 0.6431, 0.6109, 0.5782, 0.5616, 0.528, 0.5111, 0.4939, 0.4592, 0.4416, 0.4239, 0.406, 0.3879, 0.3696, 0.3324, 0.3324, 0.3324, 0.3112, 0.2896, 0.2675, 0.2449, 0.2449, 0.1931, 0.1931, 0.1629, 0.1629, 0.0], "n": 60},
+"protecao": {"tempo": [0.0, 1.0, 4.0, 5.0, 6.0, 10.0, 14.0, 18.0, 19.0, 20.0, 25.0, 26.0, 33.0, 34.0, 36.0, 42.0, 45.0, 48.0, 49.0, 52.0, 60.0, 63.0, 75.0, 77.0, 85.0, 99.0, 105.0, 111.0, 120.0, 126.0, 143.0, 160.0, 186.0, 200.0, 209.0, 211.0, 215.0, 238.0, 239.0, 240.0, 244.0, 248.0, 259.0, 293.0, 298.0, 307.0, 331.0, 376.0, 377.0, 386.0, 416.0, 437.0, 528.0, 622.0, 644.0, 733.0, 954.0, 970.0, 1007.0, 1019.0, 1028.0, 1030.0, 1036.0, 1048.0, 1123.0, 1155.0, 1156.0, 1165.0, 1210.0, 1261.0, 1271.0, 1273.0, 1334.0, 1351.0, 1359.0, 1377.0, 1379.0, 1407.0, 1412.0, 1432.0, 1576.0, 1619.0, 1672.0, 1725.0, 1811.0, 1852.0, 1853.0, 1882.0, 1896.0, 1900.0, 1930.0, 2009.0, 2064.0, 2104.0, 2183.0, 2323.0, 2476.0, 2740.0, 2789.0, 2796.0, 2929.0, 3011.0, 3199.0, 3365.0, 3427.0, 3931.0, 4775.0], "sobrevivencia": [1.0, 0.9915, 0.9915, 0.9828, 0.9656, 0.9397, 0.9225, 0.9139, 0.9052, 0.8966, 0.8966, 0.8879, 0.8792, 0.8705, 0.8618, 0.8531, 0.827, 0.8183, 0.8096, 0.8009, 0.7835, 0.7747, 0.7747, 0.7659, 0.7571, 0.7483, 0.7483, 0.7394, 0.7305, 0.7127, 0.7038, 0.6949, 0.686, 0.6771, 0.6682, 0.6592, 0.6503, 0.6414, 0.6325, 0.6236, 0.6147, 0.6058, 0.5969, 0.588, 0.588, 0.5789, 0.5699, 0.5608, 0.5518, 0.5427, 0.5247, 0.5156, 0.5066, 0.4975, 0.4885, 0.4704, 0.4613, 0.4523, 0.4432, 0.4342, 0.4252, 0.4161, 0.4071, 0.398, 0.398, 0.3888, 0.3795, 0.3702, 0.361, 0.3517, 0.3425, 0.3332, 0.324, 0.3147, 0.3055, 0.2962, 0.2869, 0.2777, 0.2684, 0.2592, 0.2499, 0.2407, 0.2314, 0.2221, 0.2129, 0.2036, 0.1944, 0.1851, 0.1759, 0.1574, 0.1481, 0.1388, 0.1296, 0.1203, 0.1111, 0.1018, 0.0926, 0.0926, 0.0926, 0.081, 0.0694, 0.0579, 0.0463, 0.0463, 0.0309, 0.0309, 0.0309], "ic_inferior": [1.0, 0.9409, 0.9409, 0.9331, 0.9109, 0.8777, 0.8563, 0.8458, 0.8354, 0.8251, 0.8251, 0.8148, 0.8046, 0.7944, 0.7843, 0.7743, 0.7448, 0.735, 0.7253, 0.7157, 0.6966, 0.6871, 0.6871, 0.6775, 0.668, 0.6585, 0.6585, 0.6489, 0.6394, 0.6204, 0.611, 0.6016, 0.5923, 0.583, 0.5737, 0.5645, 0.5553, 0.5461, 0.537, 0.5279, 0.5188, 0.5098, 0.5008, 0.4918, 0.4918, 0.4827, 0.4737, 0.4646, 0.4556, 0.4466, 0.4288, 0.4199, 0.4111, 0.4022, 0.3935, 0.376, 0.3673, 0.3586, 0.35, 0.3414, 0.3329, 0.3243, 0.3158, 0.3074, 0.3074, 0.2987, 0.2901, 0.2815, 0.2729, 0.2644, 0.2559, 0.2475, 0.2391, 0.2308, 0.2224, 0.2142, 0.206, 0.1978, 0.1897, 0.1816, 0.1735, 0.1656, 0.1576, 0.1498, 0.142, 0.1342, 0.1265, 0.1189, 0.1113, 0.0965, 0.0891, 0.0819, 0.0748, 0.0678, 0.0609, 0.0541, 0.0475, 0.0475, 0.0475, 0.0389, 0.0307, 0.0231, 0.0161, 0.0161, 0.0072, 0.0072, 0.0072], "ic_superior": [1.0, 0.9988, 0.9988, 0.9957, 0.9869, 0.9708, 0.9589, 0.9527, 0.9464, 0.9399, 0.9399, 0.9333, 0.9266, 0.9198, 0.913, 0.906, 0.8847, 0.8775, 0.8702, 0.8629, 0.8481, 0.8407, 0.8407, 0.8331, 0.8255, 0.8178, 0.8178, 0.81, 0.8022, 0.7864, 0.7784, 0.7705, 0.7624, 0.7544, 0.7463, 0.7382, 0.73, 0.7218, 0.7136, 0.7054, 0.6971, 0.6888, 0.6804, 0.672, 0.672, 0.6635, 0.655, 0.6464, 0.6378, 0.6292, 0.6118, 0.6031, 0.5944, 0.5856, 0.5768, 0.5591, 0.5502, 0.5412, 0.5323, 0.5233, 0.5143, 0.5052, 0.4961, 0.487, 0.487, 0.4777, 0.4684, 0.459, 0.4496, 0.4401, 0.4306, 0.4211, 0.4115, 0.4019, 0.3923, 0.3826, 0.3729, 0.3631, 0.3533, 0.3435, 0.3336, 0.3236, 0.3137, 0.3036, 0.2935, 0.2834, 0.2732, 0.2629, 0.2526, 0.2317, 0.2212, 0.2105, 0.1998, 0.189, 0.1781, 0.1671, 0.1559, 0.1559, 0.1559, 0.143, 0.1297, 0.1159, 0.1017, 0.1017, 0.0858, 0.0858, 0.0858], "n": 124}};
+
+// Retorna S(t) real (função degrau) para um tempo qualquer
+function sobrevivenciaEm(tArray, sArray, t){
+  var s = 1.0;
+  for (var i=0;i<tArray.length;i++){
+    if (tArray[i] <= t) { s = sArray[i]; } else { break; }
+  }
+  return s;
+}
+function icEm(curva, t){
+  var inf=1.0, sup=1.0;
+  for (var i=0;i<curva.tempo.length;i++){
+    if (curva.tempo[i] <= t) { inf=curva.ic_inferior[i]; sup=curva.ic_superior[i]; } else { break; }
+  }
+  return [inf, sup];
+}
+
+// ----- Tabela de marcos: preenche com valores reais -----
+(function(){
+  var marcos = [30, 90, 180, 365, 730];
+  var corpo = document.getElementById('kmDataBody');
+  var linhas = '';
+  marcos.forEach(function(m){
+    var sp = sobrevivenciaEm(kmDados.punicao.tempo, kmDados.punicao.sobrevivencia, m);
+    var sv = sobrevivenciaEm(kmDados.protecao.tempo, kmDados.protecao.sobrevivencia, m);
+    var icp = icEm(kmDados.punicao, m);
+    var icv = icEm(kmDados.protecao, m);
+    linhas += '<tr><td class="lbl">'+m+' dias</td><td>'+Math.round(sp*100)+'% ['+Math.round(icp[0]*100)+'–'+Math.round(icp[1]*100)+']</td><td>'+Math.round(sv*100)+'% ['+Math.round(icv[0]*100)+'–'+Math.round(icv[1]*100)+']</td></tr>';
+  });
+  linhas += '<tr><td class="lbl">Eventos observados</td><td>54/60</td><td>106/124</td></tr>';
+  corpo.innerHTML = linhas;
+
+  document.getElementById('tjmgNode').addEventListener('click', function(){
+    var painel = document.getElementById('kmDataPanel');
+    painel.style.display = (painel.style.display === 'block') ? 'none' : 'block';
+    if (painel.style.display === 'block') {
+      painel.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  });
+})();
+
+
+(function(){
+  var plotX0=34, plotX1=152, plotY0=260, plotY1=155, tMax=900;
+  var hoverArea=document.getElementById('kmHoverArea');
+  var guide=document.getElementById('kmGuide');
+  var dotPun=document.getElementById('kmDotPun');
+  var dotProt=document.getElementById('kmDotProt');
+  var svgEl=document.getElementById('svg');
+
+  function svgPoint(evt){
+    var pt=svgEl.createSVGPoint();
+    pt.x=evt.clientX; pt.y=evt.clientY;
+    var ctm=svgEl.getScreenCTM().inverse();
+    return pt.matrixTransform(ctm);
+  }
+
+  hoverArea.addEventListener('mousemove', function(evt){
+    var p=svgPoint(evt);
+    var x=Math.max(plotX0, Math.min(plotX1, p.x));
+    var t=((x-plotX0)/(plotX1-plotX0))*tMax;
+    var sPun=sobrevivenciaEm(kmDados.punicao.tempo, kmDados.punicao.sobrevivencia, t);
+    var sProt=sobrevivenciaEm(kmDados.protecao.tempo, kmDados.protecao.sobrevivencia, t);
+    var icPun=icEm(kmDados.punicao, t);
+    var icProt=icEm(kmDados.protecao, t);
+
+    guide.setAttribute('x1', x); guide.setAttribute('x2', x);
+    guide.setAttribute('visibility','visible');
+    dotPun.setAttribute('cx', x); dotPun.setAttribute('cy', plotY0 - sPun*(plotY0-plotY1));
+    dotPun.setAttribute('visibility','visible');
+    dotProt.setAttribute('cx', x); dotProt.setAttribute('cy', plotY0 - sProt*(plotY0-plotY1));
+    dotProt.setAttribute('visibility','visible');
+
+    tip.innerHTML='<strong>t ≈ '+Math.round(t)+' dias</strong>'+
+      'Punição — S(t) = '+sPun.toFixed(3)+', IC95% ['+icPun[0].toFixed(2)+'–'+icPun[1].toFixed(2)+']<br>'+
+      'Proteção — S(t) = '+sProt.toFixed(3)+', IC95% ['+icProt[0].toFixed(2)+'–'+icProt[1].toFixed(2)+']';
+    tip.style.display='block';
+    move(evt);
+  });
+  hoverArea.addEventListener('mouseleave', function(){
+    guide.setAttribute('visibility','hidden');
+    dotPun.setAttribute('visibility','hidden');
+    dotProt.setAttribute('visibility','hidden');
+    hide();
+  });
+})();
+
+function show(e,k){
+var d=tips[k];if(!d)return;
+tip.innerHTML='<strong>'+d.t+'</strong>'+d.b;
+tip.style.display='block';
+move(e);
+}
+function move(e){
+var x=e.clientX+14,y=e.clientY-10;
+var tw=310,th=tip.offsetHeight||120;
+if(x+tw>window.innerWidth-10)x=e.clientX-tw-10;
+if(y+th>window.innerHeight-10)y=e.clientY-th-10;
+tip.style.left=x+'px';tip.style.top=y+'px';
+}
+function hide(){tip.style.display='none';}
+
+document.querySelectorAll('[data-tip]').forEach(function(el){
+var k=el.getAttribute('data-tip');
+var lk=el.getAttribute('data-link');
+el.addEventListener('mouseenter',function(e){show(e,k);});
+el.addEventListener('mousemove',move);
+el.addEventListener('mouseleave',hide);
+if(lk){el.addEventListener('click',function(){window.open(lk,'_blank');});}
+});
+document.querySelectorAll('.km-chips span[data-tip]').forEach(function(el){
+var k=el.getAttribute('data-tip');
+el.addEventListener('mouseenter',function(e){show(e,k);});
+el.addEventListener('mousemove',move);
+el.addEventListener('mouseleave',hide);
+});
+</script>
+
+</body>
+</html>
